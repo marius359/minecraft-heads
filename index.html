@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Têtes de mobs Minecraft — 26.3</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#111;color:#fff;font-family:Arial,sans-serif;padding:18px}
+h1{text-align:center;margin:4px 0 8px;font-size:25px}
+#stats{text-align:center;color:#bbb;margin-bottom:15px}
+#bar{height:12px;background:#292929;border-radius:10px;overflow:hidden;max-width:650px;margin:0 auto 18px}
+#fill{height:100%;width:0;background:#35d05f;transition:.2s}
+#search{display:block;width:100%;max-width:650px;margin:0 auto 18px;padding:12px 14px;border-radius:10px;border:1px solid #444;background:#1c1c1c;color:white;font-size:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:10px;max-width:900px;margin:auto}
+.card{background:#1b1b1b;border:2px solid #303030;border-radius:12px;padding:10px 5px;text-align:center;cursor:pointer;transition:.15s;user-select:none}
+.card:hover{transform:translateY(-2px);border-color:#555}
+.card.done{background:#164d26;border-color:#35d05f}
+.card img{width:52px;height:52px;image-rendering:pixelated;object-fit:contain;display:block;margin:0 auto 7px}
+.name{font-size:12px;line-height:1.15}
+button{display:block;margin:18px auto 0;padding:10px 16px;border:0;border-radius:9px;background:#292929;color:white;cursor:pointer}
+.small{font-size:11px;color:#777;text-align:center;margin-top:12px}
+</style>
+</head>
+<body>
+<h1>🧟 Têtes de mobs Minecraft</h1>
+<div id="stats">0 / 80 récupérées</div>
+<div id="bar"><div id="fill"></div></div>
+<input id="search" placeholder="🔎 Rechercher un mob...">
+<div class="grid" id="grid"></div>
+<button onclick="resetAll()">Réinitialiser</button>
+<div class="small">Les sprites sont ceux de Minecraft Wiki (EntitySprite). Chaque identifiant est normalisé comme le nom réel du sprite (ex. iron-golem, elder-guardian). Clique sur une tête pour la passer en vert. La progression est sauvegardée sur ce téléphone.</div>
+
+<script>
+const mobs = [{"name": "Allay", "id": "allay"}, {"name": "Armadillo", "id": "armadillo"}, {"name": "Axolotl", "id": "axolotl"}, {"name": "Abeille", "id": "bee"}, {"name": "Blaze", "id": "blaze"}, {"name": "Breeze", "id": "breeze"}, {"name": "Camel", "id": "camel"}, {"name": "Chat", "id": "cat"}, {"name": "Chèvre", "id": "goat"}, {"name": "Poulet", "id": "chicken"}, {"name": "Cochon", "id": "pig"}, {"name": "Vache", "id": "cow"}, {"name": "Creeper", "id": "creeper"}, {"name": "Dauphin", "id": "dolphin"}, {"name": "Âne", "id": "donkey"}, {"name": "Noyé", "id": "drowned"}, {"name": "Gardien des anciens", "id": "elder_guardian"}, {"name": "Dragon de l’End", "id": "ender_dragon"}, {"name": "Enderman", "id": "enderman"}, {"name": "Endermite", "id": "endermite"}, {"name": "Évocateur", "id": "evoker"}, {"name": "Renard", "id": "fox"}, {"name": "Grenouille", "id": "frog"}, {"name": "Ghast", "id": "ghast"}, {"name": "Golem géant", "id": "giant"}, {"name": "Calmar lumineux", "id": "glow_squid"}, {"name": "Gardien", "id": "guardian"}, {"name": "Hoglin", "id": "hoglin"}, {"name": "Cheval", "id": "horse"}, {"name": "Husk", "id": "husk"}, {"name": "Golem de fer", "id": "iron_golem"}, {"name": "Lama", "id": "llama"}, {"name": "Cube de magma", "id": "magma_cube"}, {"name": "Champimeuh", "id": "mooshroom"}, {"name": "Mule", "id": "mule"}, {"name": "Ocelot", "id": "ocelot"}, {"name": "Panda", "id": "panda"}, {"name": "Perroquet", "id": "parrot"}, {"name": "Phantom", "id": "phantom"}, {"name": "Piglin", "id": "piglin"}, {"name": "Piglin brute", "id": "piglin_brute"}, {"name": "Pillard", "id": "pillager"}, {"name": "Ours polaire", "id": "polar_bear"}, {"name": "Poisson-globe", "id": "pufferfish"}, {"name": "Lapin", "id": "rabbit"}, {"name": "Ravageur", "id": "ravager"}, {"name": "Saumon", "id": "salmon"}, {"name": "Mouton", "id": "sheep"}, {"name": "Shulker", "id": "shulker"}, {"name": "Poisson d’argent", "id": "silverfish"}, {"name": "Squelette", "id": "skeleton"}, {"name": "Cheval squelette", "id": "skeleton_horse"}, {"name": "Slime", "id": "slime"}, {"name": "Sniffer", "id": "sniffer"}, {"name": "Golem de neige", "id": "snow_golem"}, {"name": "Araignée", "id": "spider"}, {"name": "Calmar", "id": "squid"}, {"name": "Strider", "id": "strider"}, {"name": "Têtard", "id": "tadpole"}, {"name": "Lama marchand", "id": "trader_llama"}, {"name": "Poisson tropical", "id": "tropical_fish"}, {"name": "Tortue", "id": "turtle"}, {"name": "Vex", "id": "vex"}, {"name": "Villageois", "id": "villager"}, {"name": "Vindicator", "id": "vindicator"}, {"name": "Marchand ambulant", "id": "wandering_trader"}, {"name": "Warden", "id": "warden"}, {"name": "Sorcière", "id": "witch"}, {"name": "Wither", "id": "wither"}, {"name": "Wither squelette", "id": "wither_skeleton"}, {"name": "Loup", "id": "wolf"}, {"name": "Zoglin", "id": "zoglin"}, {"name": "Zombie", "id": "zombie"}, {"name": "Cheval zombie", "id": "zombie_horse"}, {"name": "Villageois zombie", "id": "zombie_villager"}, {"name": "Piglin zombifié", "id": "zombified_piglin"}, {"name": "Happy Ghast", "id": "happy_ghast"}, {"name": "Golem de cuivre", "id": "copper_golem"}, {"name": "Nautile", "id": "nautilus"}, {"name": "Nautile zombie", "id": "zombie_nautilus"}];
+const key = "minecraft_heads_checklist_263";
+let done = JSON.parse(localStorage.getItem(key) || "{}");
+
+function save(){ localStorage.setItem(key, JSON.stringify(done)); }
+
+function imageUrl(id){
+  return "https://minecraft.wiki/images/EntitySprite_" + id.replaceAll("_", "-") + ".png";
+}
+
+function render(){
+  const q = document.getElementById("search").value.toLowerCase().trim();
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  mobs.forEach((m, index)=>{
+    if(q && !m.name.toLowerCase().includes(q)) return;
+    const card = document.createElement("div");
+    card.className = "card" + (done[index] ? " done" : "");
+    card.onclick = ()=>{
+      done[index] = !done[index];
+      save();
+      render();
+    };
+
+    const img = document.createElement("img");
+    img.src = imageUrl(m.id);
+    img.alt = m.name;
+    img.onerror = ()=>{
+      img.src = "data:image/svg+xml;charset=utf-8," +
+        encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52"><rect width="52" height="52" fill="#333"/><text x="26" y="33" text-anchor="middle" fill="#aaa" font-size="22">?</text></svg>');
+    };
+
+    const name = document.createElement("div");
+    name.className = "name";
+    name.textContent = m.name;
+    card.appendChild(img);
+    card.appendChild(name);
+    grid.appendChild(card);
+  });
+
+  const count = Object.values(done).filter(Boolean).length;
+  document.getElementById("stats").textContent = count + " / " + mobs.length + " récupérées";
+  document.getElementById("fill").style.width = (count/mobs.length*100) + "%";
+}
+
+function resetAll(){
+  if(confirm("Réinitialiser toute la progression ?")){
+    done = {};
+    save();
+    render();
+  }
+}
+
+document.getElementById("search").addEventListener("input", render);
+render();
+</script>
+</body>
+</html>
